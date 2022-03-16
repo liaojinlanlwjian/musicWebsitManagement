@@ -60,14 +60,12 @@ module.exports = {
     // open: true,
     // host:'127.0.0.1',
     proxy:{    
-      '/v1':{
-        // target:'http://192.168.1.19:9001',
-        target:'http://192.168.0.200:9801',
-        //target:'http://192.168.0.73:9001',
-        //  target:'http://139.9.209.65:9001',       
+      '/api':{
+        target:'http://localhost:3001',
+            
         changeOrigin:true,
         pathRewrite:{
-          '^/v1^':''
+          '^/api^':'/' 
         }
       }  }
   },

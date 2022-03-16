@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="filter-container">
+    <div style="margin-left:10px">
+        <div class="filter-container" style="margin-top:20px">
             <div style="display: flex">
               <el-button class="filter-item" type="primary"  @click="showOperator"
                 >查看</el-button
@@ -33,9 +33,9 @@
               width="80"
             >
             </el-table-column>
-            <el-table-column align="center" label="编号" width="117">
+            <el-table-column align="center" label="账号" width="280">
               <template slot-scope="{ row }">
-                {{ row.bianhao }}
+                {{ row.acc }}
               </template>
             </el-table-column>
             <el-table-column align="center" label="姓名" width="280">
@@ -58,14 +58,14 @@
                 {{ row.role }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="备注" width="200">
+            <el-table-column align="center" label="地址" width="200">
               <template slot-scope="{ row }">
-                {{ row.remark }}
+                {{ row.adress }}
               </template>
             </el-table-column>
             <el-table-column align="center" label="电话">
               <template slot-scope="{ row }">
-                {{ row.phone }}
+                {{ row.tel }}
               </template>
             </el-table-column>
           </el-table>
@@ -95,17 +95,17 @@
       <el-row>
         <el-col :span="10">
           <div class="grid-content bg-purple">
-        <el-form-item label="编号" prop="bianhao">
+        <el-form-item label="账号" prop="bianhao">
           <el-input
-            v-model="user.bianhao"
+            v-model="user.acc"
             style="width: 100%"
             :disabled="inputDisabled"
             placeholder="账号"
           />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="密码" prop="psd">
           <el-input
-            v-model="user.password"
+            v-model="user.psd"
             style="width: 100%"
             :disabled="inputDisabled"
             type="password"
@@ -143,16 +143,9 @@
             :disabled="inputDisabled"
           />
         </el-form-item>
-        <el-form-item label="phone" prop="phone">
+        <el-form-item label="联系电话" prop="phone">
           <el-input
-            v-model="user.phone"
-            style="width: 100%"
-            :disabled="inputDisabled"
-          />
-        </el-form-item>
-           <el-form-item label="备注">
-          <el-input
-            v-model="user.remark"
+            v-model="user.tel"
             style="width: 100%"
             :disabled="inputDisabled"
           />
@@ -173,6 +166,13 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="地址" prop="phone">
+          <el-input
+            v-model="user.adress"
+            style="width: 100%"
+            :disabled="inputDisabled"
+          />
+        </el-form-item>
         </div>
         </el-col>
       </el-row>
@@ -184,13 +184,13 @@
             type="textarea"
             :rows="4"
             placeholder="请输入内容"
-            v-model="user.description"
+            v-model="user.des"
           >
           </el-input>
         </el-form-item>
       </el-row>
         </el-form>
-      <div style="text-align: center">
+      <div style="text-align: center" v-if="!inputDisabled">
         <el-button type="danger" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="confirm('user')">确认</el-button>
       </div>
@@ -205,7 +205,15 @@ export default {
             dialogTitle:'增加',
             multipleSelection:[],
             inputDisabled:false,
-            user:{},
+            user:{
+              acc:'212',
+              psd:'212',
+              name:'212',
+              role:'212',
+              tel:'212',
+              des:'212',
+              adress:'212',
+            },
             dialogVisible:false,
             listLoading:false,
             total:0,
@@ -241,7 +249,7 @@ export default {
                  name: [
                 { required: true, message: "请选择用户的角色", trigger: "blur" },
                 ],
-                password: [
+                psd: [
                 { required: true, message: "请输入地址", trigger: "blur" },
                 ],
                 account: [
@@ -264,13 +272,14 @@ export default {
         }
     },
     created(){
-      let data = api.showFile('operatorManagement')
-      if (data == null || data == undefined) {
-        this.total = this.tableList.length
-        return
-      }
-      this.tableList = data
-      this.total = this.tableList.length
+      this.handleQueryByPage()
+      // let data = api.showFile('operatorManagement')
+      // if (data == null || data == undefined) {
+      //   this.total = this.tableList.length
+      //   return
+      // }
+      // this.tableList = data
+      // this.total = this.tableList.length
       
     },
     methods:{
@@ -278,16 +287,24 @@ export default {
         rowClick(row, column, event) {
           this.$refs.serveTable.toggleRowSelection(row)
         },
-        showOperator(){
+        getUserMsg(id){
+          this.$axios.get(`/api/user/querySingleUser/?id=` + id).then((response)=>{
+            this.user = response.data.data[0]
+          }).catch((response)=>{
+            console.log(response);
+          })
+        },
+        async showOperator(){
             if (this.multipleSelection == 0) {
                 this.$message.error('请选择一条数据')
                 return
             }
-            this.user = this.multipleSelection[0]
+            await this.getUserMsg(this.multipleSelection[0].id)
+            this.inputDisabled = true
             this.dialogTitle = '查看'
             this.dialogVisible = true
         },
-        deleteOperator(){
+        async deleteOperator(){
             if (this.multipleSelection.length == 0) {
                 this.$message.error('请选择一条数据')
                 return
@@ -298,18 +315,20 @@ export default {
               type: 'warning'
             }).then(() => {
               this.listLoading = true
-              setTimeout(() => {
-              this.tableList.splice(this.multipleSelection[0],1)
-              api.saveFile(this.tableList,'operatorManagement')
-              this.total = this.tableList.length
+              this.$axios.delete(`/api/user/deleteSingUser/?id=` + this.multipleSelection[0].id).then((response)=>{
               this.$message({
                 type: 'success',
                 message: '删除成功!'
               });
-              this.$refs.serveTable.clearSelection()
+            this.handleQueryByPage()
               this.listLoading = false
-              }, 500);
-             
+            }).catch((response)=>{
+              this.listLoading = false
+              this.$message({
+                type: 'info',
+                message: '删除error'
+              });    
+            })
             }).catch(() => {
               this.$message({
                 type: 'info',
@@ -317,21 +336,21 @@ export default {
               });          
         });
         },
-        editOperator(){
+        async editOperator(){
             if (this.multipleSelection.length == 0) {
                 this.$message.error('请选择一条数据')
                 return
             }
-            this.user = this.multipleSelection[0]
-            this.user.password = '00000'
-            this.user.description = '无'
-            this.dialogTitle = '修改'
+            await this.getUserMsg(this.multipleSelection[0].id)
+            this.inputDisabled = false
+            this.dialogTitle = '编辑'
             this.dialogVisible = true
         },
         addOperator(){
             this.dialogTitle = '增加'
+            this.inputDisabled = false
             this.dialogVisible = true
-            this.user = {}
+            // this.user = {}
         },
         confirm(formName){
           this.$refs[formName].validate((valid) => {
@@ -339,18 +358,18 @@ export default {
             this.listLoading = true
             this.dialogVisible = false
             if(this.dialogTitle == '增加'){
-              setTimeout(() => {
-              this.$message.success('增加成功')
-              this.tableList.push(this.user)
-              api.saveFile(this.tableList,'operatorManagement')
-              this.listLoading = false
-              this.total = this.tableList.length
-              }, 500);
+              let data = this.$qs.stringify(this.user)
+              this.$axios.post(`/api/user/addSingUser`,data).then((response)=>{
+                this.$message.success('添加成功')
+                this.handleQueryByPage()
+              }).catch((response)=>{
+                console.log(response);
+              })
             }else if(this.dialogTitle == '修改'){
               setTimeout(() => {
               this.$message.success('修改成功')
               this.multipleSelection[0] = this.user
-              api.saveFile(this.tableList,'operatorManagement')
+              // api.saveFile(this.tableList,'operatorManagement')
               this.listLoading = false
               }, 500);
             }
@@ -372,11 +391,21 @@ export default {
         this.$refs.serveTable.toggleRowSelection(val.pop());
         } else {
             this.multipleSelection = val;
+            console.log(val);
         }
         },
         handleSizeChange(){},
         handleCurrentChange(){},
-        handleQueryByPage(){},
+        handleQueryByPage(){
+          this.listLoading = true
+          this.$axios.get('/api/user/queryAllUser').then((response)=>{
+            this.tableList = response.data.data;
+            this.total = response.data.data.length
+            this.listLoading = false
+          }).catch((response)=>{
+            console.log(response);
+          })
+        },
     }
 }
 </script>

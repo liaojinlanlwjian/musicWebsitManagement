@@ -25,7 +25,10 @@ import App from './App'
 import router from './router'
 
 import store from './store'
-
+import axios from 'axios'
+Vue.prototype.$axios= axios
+import qs from 'qs'
+Vue.prototype.$qs = qs
 // Internationalization
 import i18n from './lang'
 import { global } from '@/global/global'
