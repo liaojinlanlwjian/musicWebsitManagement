@@ -23,13 +23,13 @@ import { isvalidUsername } from '@/utils/validate'
 export default {
   name: 'userlogin',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
-        callback(new Error('请输入正确的用户名'))
-      } else {
-        callback()
-      }
-    }
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!isvalidUsername(value)) {
+    //     callback(new Error('请输入正确的用户名'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     const validateCode = (rule, value, callback) => {
       if (this.code.value !== value) {
         this.loginForm.code = ''
@@ -53,7 +53,7 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
+          { required: true, trigger: 'blur'}
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -83,9 +83,24 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          let loginMsg = {}
+          loginMsg['name'] = this.loginForm.username
+          loginMsg['psd'] = this.loginForm.password
+          this.$axios.get(`/api/user/loginVerifyUser`,{
+                params:{
+                    acc:this.loginForm.username,
+                    psd:this.loginForm.password
+                }
+              }).then((response)=>{
+                this.$message.success('登录成功')
+                console.log(this.loginForm);
           this.$store.dispatch('Login', this.loginForm).then(res => {
             this.$router.push({ path: '/dashboard/dashboard' })
           })
+          }).catch((response)=>{
+                this.$message.error('用户名或者密码错误')
+                console.log(response);
+              })
         }
       })
     }

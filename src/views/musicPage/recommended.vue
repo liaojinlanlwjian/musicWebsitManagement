@@ -1,18 +1,12 @@
 <template>
     <div>
-        <div class="filter-container">
-            <div style="display: flex">
-              <el-button class="filter-item" type="primary"  @click="showOperator"
-                >查看</el-button
+        <div style="margin-left:10px" class="filter-container">
+            <div style="display: flex;margin-top:20px">
+              <el-button class="filter-item" type="primary"  @click="addRecommended"
+                >从主表中添加歌曲</el-button
               >
-              <el-button class="filter-item" type="primary" @click="addOperator"
-                >增加</el-button
-              >
-              <el-button class="filter-item" type="primary"  @click="editOperator"
-                >修改</el-button
-              >
-              <el-button class="filter-item" type="danger"  @click="deleteOperator"
-                >删除</el-button
+              <el-button class="filter-item" type="primary" @click="deleteRecommended"
+                >移除</el-button
               >
             </div>
           </div>
@@ -25,47 +19,59 @@
             v-loading="listLoading"
             @row-click="rowClick"
           >
-            <el-table-column type="selection" width="50"> </el-table-column>
+            <el-table-column type="selection" width="40"> </el-table-column>
             <el-table-column
               align="center"
               label="序号"
               type="index"
-              width="80"
+              width="50"
             >
             </el-table-column>
-            <el-table-column align="center" label="编号" width="117">
+            <el-table-column align="center" label="歌曲名称" width="147">
               <template slot-scope="{ row }">
-                {{ row.bianhao }}
+                {{ row.musicName }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="姓名" width="280">
+            <el-table-column align="center" label="歌手" width="140">
               <template slot-scope="{ row }">
-                {{ row.name }}
+                {{ row.musicSinger }}
+
               </template>
             </el-table-column>
-            <el-table-column align="center" label="性别" width="200">
+            <el-table-column align="center" label="音乐封面" width="200">
               <template slot-scope="{ row }">
-                {{ row.sex }}
+                <img
+                    style="width:60px;height:60px"
+                    :src="row.musicCover">
               </template>
             </el-table-column>
-            <el-table-column align="center" label="职务" width="150">
+            <el-table-column align="center" label="访问量" width="120">
               <template slot-scope="{ row }">
-                {{ row.work }}
+                {{ row.musicTraffic }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="角色" width="200">
+            <el-table-column align="center" label="下载量" width="120">
               <template slot-scope="{ row }">
-                {{ row.role }}
+                {{ row.musicDownloads }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="备注" width="200">
+            <el-table-column align="center" label="作者" width="140">
               <template slot-scope="{ row }">
-                {{ row.remark }}
+                {{ row.musicAuthor }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="电话">
-              <template slot-scope="{ row }">
-                {{ row.phone }}
+            <el-table-column align="center" label="歌曲类型" width="140">
+             <template slot-scope="{ row }">
+                {{ row.musicType }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="是否上线" width="140">
+              <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.musicStatus"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+              </el-switch>
               </template>
             </el-table-column>
           </el-table>
@@ -84,115 +90,124 @@
     <el-dialog
       :visible.sync="dialogVisible"
       :title="dialogTitle"
+      :fullscreen="true"
     >
-      <el-form
-        :model="user"
-        :rules="rules"
-        ref="user"
-        label-width="100px"
-        label-position="left"
-      >
-      <el-row>
-        <el-col :span="10">
-          <div class="grid-content bg-purple">
-        <el-form-item label="编号" prop="bianhao">
-          <el-input
-            v-model="user.bianhao"
-            style="width: 100%"
-            :disabled="inputDisabled"
-            placeholder="账号"
-          />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input
-            v-model="user.password"
-            style="width: 100%"
-            :disabled="inputDisabled"
-            type="password"
-            placeholder="密码"
-          />
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-select v-model="user.sex" placeholder="请选择" :disabled="inputDisabled">
-            <el-option
-              v-for="item in sexOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
- 
-        </el-form-item>
-         <el-form-item label="姓名" prop="name">
-          <el-input
-            v-model="user.name"
-            style="width: 100%"
-            :disabled="inputDisabled"
-            placeholder=" 用户名称"
-          />
-        </el-form-item>
-         
-        </div>
-        </el-col  >
-        <el-col :span="11" style="margin-left: 55px">
-          <div class="grid-content bg-purple">
-          <el-form-item label="角色">
-          <el-input
-            v-model="user.role"
-            style="width: 100%"
-            :disabled="inputDisabled"
-          />
-        </el-form-item>
-        <el-form-item label="phone" prop="phone">
-          <el-input
-            v-model="user.phone"
-            style="width: 100%"
-            :disabled="inputDisabled"
-          />
-        </el-form-item>
-           <el-form-item label="备注">
-          <el-input
-            v-model="user.remark"
-            style="width: 100%"
-            :disabled="inputDisabled"
-          />
-        </el-form-item>
-        <el-form-item label="职务" prop="roleIds">
-          <el-select
-            v-model="user.work"
-            :disabled="inputDisabled"
-            @change="selectDisposeCode"
-            placeholder="请选择"
+    <el-button type="primary" @click="addSingIn">添加</el-button>
+          <div style="width:100%;height:220px">
+          <el-table
+            :data="tableListSing"
+            @selection-change="tableChangeSing"
+            style="width: 70%"
+            border
+            ref="serveTableSing"
+            v-loading="listLoadingSing"
+            @row-click="rowClickSing"
           >
-            <el-option
-              v-for="item in options"
-              :key="item.label"
-              :label="item.label"
-              :value="item.value"
+            <el-table-column type="selection" width="40"> </el-table-column>
+            <el-table-column
+              align="center"
+              label="序号"
+              type="index"
+              width="50"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        </div>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-form-item label=" 用户描述" prop="description">
-          <el-input
-            :disabled="inputDisabled"
-            style="width: 100%"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入内容"
-            v-model="user.description"
-          >
-          </el-input>
-        </el-form-item>
-      </el-row>
-        </el-form>
-      <div style="text-align: center">
+            </el-table-column>
+            <el-table-column align="center" label="歌曲名称" width="147">
+              <template slot-scope="{ row }">
+                {{ row.musicName }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="歌手" width="140">
+              <template slot-scope="{ row }">
+                {{ row.musicSinger }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="访问量" width="120">
+              <template slot-scope="{ row }">
+                {{ row.musicTraffic }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="下载量" width="120">
+              <template slot-scope="{ row }">
+                {{ row.musicDownloads }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="作者" width="140">
+              <template slot-scope="{ row }">
+                {{ row.musicAuthor }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="歌曲类型" width="140">
+             <template slot-scope="{ row }">
+                {{ row.musicType }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="是否上线" width="140">
+              <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.musicStatus"
+                active-color="#13ce66"
+                inactive-color="#ff4949">
+              </el-switch>
+              </template>
+            </el-table-column>
+          </el-table>
+          </div>
+          <div v-if="tableShow">
+            <h1>以下是选中的歌曲:</h1>
+          <el-table
+          :data="tableListCh"
+            border
+          style="width: 65%;margin-top:20px">
+        <el-table-column
+                    align="center"
+                    label="序号"
+                    type="index"
+                    width="50"
+                  >
+                  </el-table-column>
+                  <el-table-column align="center" label="歌曲名称" width="147">
+                    <template slot-scope="{ row }">
+                      {{ row.musicName }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="歌手" width="140">
+                    <template slot-scope="{ row }">
+                      {{ row.musicSinger }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="访问量" width="120">
+                    <template slot-scope="{ row }">
+                      {{ row.musicTraffic }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="下载量" width="120">
+                    <template slot-scope="{ row }">
+                      {{ row.musicDownloads }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="作者" width="140">
+                    <template slot-scope="{ row }">
+                      {{ row.musicAuthor }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column align="center" label="歌曲类型" width="140">
+                  <template slot-scope="{ row }">
+                      {{ row.musicType }}
+                    </template>
+                  </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="scope">
+              <el-button
+                size="mini"
+                type="danger"
+                @click="handleDelete(scope.$index, scope.row)">移除</el-button>
+            </template>
+          </el-table-column>
+          </el-table>
+           </div>
+      <div style="text-align: center;margin-top:30px" v-if="tableShow">
         <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirm('user')">确认</el-button>
+        <el-button type="primary" @click="confirmSing">确认</el-button>
       </div>
       </el-dialog>
     </div>
@@ -204,79 +219,44 @@ export default {
         return{
             dialogTitle:'增加',
             multipleSelection:[],
+            multipleSelectionSing:[],
+            multipleSelectionCh:[],
             inputDisabled:false,
             user:{},
             dialogVisible:false,
             listLoading:false,
+            listLoadingSing:false,
             total:0,
             editingAndResearchManagementQuery:{},
-            tableList:[
-                {
-                    bianhao: '2016-05-02',
-                    name: '王小虎',
-                    sex: '男',
-                    work: '董事长',
-                    role: '超级管理员',
-                    remark: '小心点',
-                    phone: ' 1518 弄'
-                },
-                {
-                    bianhao: '07716',
-                    name: '王小猪',
-                    sex: '男',
-                    work: '副董事长',
-                    role: '超级管理员',
-                    remark: '千万小心点',
-                    phone: ' 1519 弄'
-                },
-            ],
-            sexOptions:[{
-                value: '男',
-                label: '男'
-                }, {
-                value: '女',
-                label: '女'
-            }], 
-            rules:{
-                 name: [
-                { required: true, message: "请选择用户的角色", trigger: "blur" },
-                ],
-                password: [
-                { required: true, message: "请输入地址", trigger: "blur" },
-                ],
-                account: [
-                { required: true, message: "请选择用户的部门", trigger: "blur" },
-                ],
-            },
-            options: [
-              {
-                value: '总经理',
-                label: '总经理'
-                },
-                {
-                value: '秘书',
-                label: '秘书'
-                }, {
-                value: '董事长',
-                label: '董事长'
-            }
-            ],
+            tableList:[],
+            tableListCh:[],
+            tableListSing:[],
+            tableShow:false,
         }
     },
     created(){
-      let data = api.showFile('operatorManagement')
-      if (data == null || data == undefined) {
-        this.total = this.tableList.length
-        return
-      }
-      this.tableList = data
-      this.total = this.tableList.length
-      
+      this.handleQueryByPage()
     },
     methods:{
+      handleDelete(index,row){
+        this.tableListCh.splice(row,1)
+        this.$refs.serveTableSing.clearSelection(row)
+      },
+      addSingIn(){
+        if (this.multipleSelectionSing.length == 0) {
+          this.$message.error('请在主表选择要添加的歌曲')
+          return
+        }
+        this.tableShow = true
+        let data = this.multipleSelectionSing
+        this.tableListCh = data
+      },
         //监听row-click事件，实现选中
         rowClick(row, column, event) {
           this.$refs.serveTable.toggleRowSelection(row)
+        },
+        rowClickSing(row, column, event) {
+          this.$refs.serveTableSing.toggleRowSelection(row)
         },
         showOperator(){
             if (this.multipleSelection == 0) {
@@ -287,7 +267,7 @@ export default {
             this.dialogTitle = '查看'
             this.dialogVisible = true
         },
-        deleteOperator(){
+        deleteRecommended(){
             if (this.multipleSelection.length == 0) {
                 this.$message.error('请选择一条数据')
                 return
@@ -298,18 +278,14 @@ export default {
               type: 'warning'
             }).then(() => {
               this.listLoading = true
-              setTimeout(() => {
-              this.tableList.splice(this.multipleSelection[0],1)
-              api.saveFile(this.tableList,'operatorManagement')
-              this.total = this.tableList.length
+              this.$axios.delete(`/api/recommend/deleteSingRecommend/?id=` + this.multipleSelection[0].id).then((response)=>{
               this.$message({
                 type: 'success',
                 message: '删除成功!'
               });
-              this.$refs.serveTable.clearSelection()
+            this.handleQueryByPage()
               this.listLoading = false
-              }, 500);
-             
+              })
             }).catch(() => {
               this.$message({
                 type: 'info',
@@ -317,49 +293,22 @@ export default {
               });          
         });
         },
-        editOperator(){
-            if (this.multipleSelection.length == 0) {
-                this.$message.error('请选择一条数据')
-                return
-            }
-            this.user = this.multipleSelection[0]
-            this.user.password = '00000'
-            this.user.description = '无'
-            this.dialogTitle = '修改'
+        addRecommended(){
+            this.dialogTitle = '选择歌曲进行添加'
+            this.tableShow = false
             this.dialogVisible = true
+            this.handleQueryByPageSing()
+            // this.user = {}
         },
-        addOperator(){
-            this.dialogTitle = '增加'
-            this.dialogVisible = true
-            this.user = {}
-        },
-        confirm(formName){
-          this.$refs[formName].validate((valid) => {
-          if (valid) {
-            this.listLoading = true
-            this.dialogVisible = false
-            if(this.dialogTitle == '增加'){
-              setTimeout(() => {
-              this.$message.success('增加成功')
-              this.tableList.push(this.user)
-              api.saveFile(this.tableList,'operatorManagement')
-              this.listLoading = false
-              this.total = this.tableList.length
-              }, 500);
-            }else if(this.dialogTitle == '修改'){
-              setTimeout(() => {
-              this.$message.success('修改成功')
-              this.multipleSelection[0] = this.user
-              api.saveFile(this.tableList,'operatorManagement')
-              this.listLoading = false
-              }, 500);
-            }
-            
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+        confirmSing(){
+          let data = this.tableListCh
+          this.$axios.post(`/api/recommend/batchInsertRecommend`,data).then((response)=>{
+                this.$message.success('添加成功')
+                this.dialogVisible = false
+                this.handleQueryByPage()
+              }).catch((response)=>{
+                console.log(response);
+              })
         },
         //角色选择的chang事件
         selectDisposeCode(ids) {   
@@ -374,9 +323,41 @@ export default {
             this.multipleSelection = val;
         }
         },
+        //主表table的选择
+        tableChangeSing(val) {
+            this.multipleSelectionSing = val;
+        },
         handleSizeChange(){},
         handleCurrentChange(){},
-        handleQueryByPage(){},
+        handleQueryByPage(){
+          this.listLoading = true
+          this.$axios.get('/api/recommend/queryAllRecommend').then((response)=>{
+            this.tableList = response.data.data.map(e=>{
+              e.musicStatus = Boolean(e.musicStatus) 
+              return e
+            })
+            this.total = response.data.data.length
+            this.listLoading = false
+          }).catch((response)=>{
+            console.log(response);
+          })
+        },
+        handleQueryByPageSing(){
+          this.listLoadingSing = true
+          this.$axios.get('/api/music/queryAllMusic').then((response)=>{
+            this.tableListSing = response.data.data.map(e=>{
+              e.musicStatus = Boolean(e.musicStatus) 
+              return e
+            })
+            let newArr = this.tableListSing.filter((item) => {
+                return  !this.tableList.some(ele=>ele.musicName===item.musicName)
+            });
+            this.tableListSing = newArr
+            this.listLoadingSing = false
+          }).catch((response)=>{
+            console.log(response);
+          })
+        },
     }
 }
 </script>
