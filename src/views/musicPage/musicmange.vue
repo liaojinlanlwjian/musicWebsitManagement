@@ -73,10 +73,12 @@
             <el-table-column align="center" label="是否上线" width="140">
               <template slot-scope="scope">
               <el-switch
-                v-model="scope.row.musicStatus"
-                active-color="#13ce66"
-                inactive-color="#ff4949">
-              </el-switch>
+                  v-model="scope.row.musicStatus"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-value="1"
+                  inactive-value="0">
+                </el-switch>
               </template>
             </el-table-column>
           </el-table>
@@ -157,12 +159,14 @@
             </el-option>
           </el-select>
         </el-form-item>
-         <el-form-item label="是否上线" prop="roleIds">
+         <el-form-item label="是否上线">
           <el-switch
-            v-model="music.musicStatus"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
+                  v-model="music.musicStatus"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-value="1"
+                  inactive-value="0">
+                </el-switch>
         </el-form-item>
         </div>
         </el-col  >
@@ -183,11 +187,12 @@
           />
         </el-form-item>
            <el-form-item label="歌曲封面">
-          <el-input
+              <el-button type="primary" @click="selectPic" size="mini">上传歌曲封面</el-button>
+          <!-- <el-input
             v-model="music.musicCover"
             style="width: 100%"
             :disabled="inputDisabled"
-          />
+          /> -->
         </el-form-item>
         <el-form-item label="歌曲封面">
            <img
@@ -217,6 +222,21 @@
         <el-button type="primary" @click="confirm('music')">确认</el-button>
       </div>
       </el-dialog>
+      <el-dialog
+      :visible.sync="uploadDialog"
+      title="上传图片"
+      >
+      <el-upload
+  class="upload-demo"
+  ref="upload"
+  action=""
+  :on-change="changeFile"
+  :file-list="fileList"
+  :auto-upload="false">
+  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+  <el-button style="margin-left: 10px;" size="small" type="success" @click="upload">上传到服务器</el-button>
+</el-upload>
+      </el-dialog>
     </div>
 </template>
 <script>
@@ -224,10 +244,16 @@
 export default {
     data(){
         return{
+          chooseFile:{},
+          fileList:[],
+          uploadDialog:false,
             dialogTitle:'增加',
             multipleSelection:[],
             inputDisabled:false,
-            music:{},
+            music:{
+              musicStatus:false,
+              musicCover:''
+            },
             dialogVisible:false,
             listLoading:false,
             total:0,
@@ -273,13 +299,40 @@ export default {
      this.handleQueryByPage()
     },
         methods:{
+        selectPic(){
+          this.uploadDialog = true
+        },
+        changeFile(file){
+          this.chooseFile = file
+        },
+        upload(){    
+          if (Object.keys(this.chooseFile).length == 0) {
+            this.$message.error('请先选择图片')
+            return
+          }       
+          var formData = new FormData()
+          //创建formdata对象
+          formData.append("file",this.chooseFile.raw)  
+          // 将文件信息 append 进入formdata对象  key值 为后台 single 设置的值  
+          this.$axios.post('/api/music/upload',formData,{
+            Headers:{
+              "Content-Type":"multipart/form-data"
+            }
+          }).then(res=>{
+            this.uploadDialog = false
+            this.$message.success('上传成功')
+            this.music.musicCover ='http://localhost:3001' + res.data.data
+          }).catch((err)=>{
+            this.$message.error('上传失败，请重试')
+          })
+          return
+          },
         //监听row-click事件，实现选中
         rowClick(row, column, event) {
           this.$refs.serveTable.toggleRowSelection(row)
         },
         getUserMsg(id){
           this.$axios.get(`/api/music/querySingleMusic/?id=` + id).then((response)=>{
-            response.data.data[0].musicStatus = Boolean(response.data.data[0].musicStatus)
             this.music = response.data.data[0]
           }).catch((response)=>{
             console.log(response);
@@ -346,7 +399,11 @@ export default {
         confirm(formName){
           this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(this.music);
+            if (this.music.musicStatus == false) {
+              this.music.musicStatus = 0
+            }else{
+              this.music.musicStatus = 1
+            }
             let data = this.$qs.stringify(this.music)
             this.listLoading = true
             this.dialogVisible = false
@@ -354,6 +411,7 @@ export default {
               this.$axios.post(`/api/music/addSingMusic`,data).then((response)=>{
                 this.$message.success('添加成功')
                 this.handleQueryByPage()
+                this.fileList = []
               }).catch((response)=>{
                 console.log(response);
               })
@@ -395,11 +453,7 @@ export default {
         handleQueryByPage(){
           this.listLoading = true
           this.$axios.get('/api/music/queryAllMusic/?start=' + this.Query.start).then((response)=>{
-            this.tableList = response.data.data.map(e=>{
-              e.musicStatus = Boolean(e.musicStatus) 
-              return e
-            })
-            this.tableList = response.data.data;
+            this.tableList = response.data.data
             this.total = response.data.paging.total[0].total
             this.listLoading = false
           }).catch((response)=>{

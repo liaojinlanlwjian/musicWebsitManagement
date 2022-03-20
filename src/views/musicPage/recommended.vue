@@ -13,7 +13,7 @@
           <el-table
             :data="tableList"
             @selection-change="tableChange"
-            style="width: 90%;margin-top:20px"
+            style="width: 100%;margin-top:20px"
             border
             ref="serveTable"
             v-loading="listLoading"
@@ -65,7 +65,7 @@
                 {{ row.musicType }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="是否上线" width="140">
+            <el-table-column align="center" label="是否上线" width="120">
               <template slot-scope="scope">
               <el-switch
                 v-model="scope.row.musicStatus"
@@ -77,9 +77,9 @@
           </el-table>
           <!-- 主表的分页 -->
           <el-pagination
-            :current-page="editingAndResearchManagementQuery.current"
-            :page-sizes="[10, 20, 50, 100, 1000]"
-            :page-size="editingAndResearchManagementQuery.size"
+            :current-page="Query.current"
+            :page-sizes="[5]"
+            :page-size="Query.size"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
             @size-change="handleSizeChange"
@@ -144,13 +144,26 @@
             <el-table-column align="center" label="是否上线" width="140">
               <template slot-scope="scope">
               <el-switch
-                v-model="scope.row.musicStatus"
-                active-color="#13ce66"
-                inactive-color="#ff4949">
-              </el-switch>
+                  v-model="scope.row.musicStatus"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-value="1"
+                  inactive-value="0">
+                </el-switch>
               </template>
             </el-table-column>
           </el-table>
+          <!-- 歌曲总表的分页 -->
+          <el-pagination
+            :current-page="singQuery.current"
+            :page-sizes="[5]"
+            :page-size="singQuery.size"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalSing"
+            @size-change="handleSizeChangeSing"
+            @current-change="handleCurrentChangeSing"
+            @pagination="handleQueryByPageSing"
+          />
           </div>
           <div v-if="tableShow">
             <h1>以下是选中的歌曲:</h1>
@@ -227,7 +240,15 @@ export default {
             listLoading:false,
             listLoadingSing:false,
             total:0,
-            editingAndResearchManagementQuery:{},
+            totalSing:0,
+            Query:{
+              start:0,
+              num:2,
+            },
+            singQuery:{
+              start:0,
+              num:2
+            },
             tableList:[],
             tableListCh:[],
             tableListSing:[],
@@ -327,16 +348,27 @@ export default {
         tableChangeSing(val) {
             this.multipleSelectionSing = val;
         },
+        handleSizeChangeSing(){},
+        handleCurrentChangeSing(current){
+          var m = new Map([[1, 0], [2, 5], [3, 10], [4, 15], [5, 20], [6, 25]]);
+         this.singQuery.start =  m.get(current);
+         this.handleQueryByPageSing()
+        },
         handleSizeChange(){},
-        handleCurrentChange(){},
+        handleCurrentChange(current){
+          var m = new Map([[1, 0], [2, 5], [3, 10], [4, 15], [5, 20], [6, 25]]);
+         this.Query.start =  m.get(current);
+         this.handleQueryByPage()
+        },
         handleQueryByPage(){
           this.listLoading = true
-          this.$axios.get('/api/recommend/queryAllRecommend').then((response)=>{
+          this.$axios.get('/api/recommend/queryAllRecommend/?start=' + this.Query.start).then((response)=>{
             this.tableList = response.data.data.map(e=>{
               e.musicStatus = Boolean(e.musicStatus) 
               return e
             })
-            this.total = response.data.data.length
+             this.tableList = response.data.data;
+            this.total = response.data.paging.total[0].total
             this.listLoading = false
           }).catch((response)=>{
             console.log(response);
@@ -344,7 +376,7 @@ export default {
         },
         handleQueryByPageSing(){
           this.listLoadingSing = true
-          this.$axios.get('/api/music/queryAllMusic').then((response)=>{
+          this.$axios.get('/api/music/queryAllMusic/?start=' + this.singQuery.start).then((response)=>{
             this.tableListSing = response.data.data.map(e=>{
               e.musicStatus = Boolean(e.musicStatus) 
               return e
@@ -353,6 +385,7 @@ export default {
                 return  !this.tableList.some(ele=>ele.musicName===item.musicName)
             });
             this.tableListSing = newArr
+            this.totalSing = response.data.paging.total[0].total
             this.listLoadingSing = false
           }).catch((response)=>{
             console.log(response);

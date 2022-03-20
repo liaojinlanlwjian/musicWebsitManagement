@@ -76,9 +76,9 @@
           </el-table>
           <!-- 主表的分页 -->
           <el-pagination
-            :current-page="editingAndResearchManagementQuery.current"
-            :page-sizes="[10, 20, 50, 100, 1000]"
-            :page-size="editingAndResearchManagementQuery.size"
+            :current-page="Query.current"
+            :page-sizes="[5]"
+            :page-size="Query.size"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
             @size-change="handleSizeChange"
@@ -222,7 +222,10 @@ export default {
             dialogVisible:false,
             listLoading:false,
             total:0,
-            editingAndResearchManagementQuery:{},
+            Query:{
+              start:0,
+              num:2,
+            },
             tableList:[
                 {
                     bianhao: '2016-05-02',
@@ -400,12 +403,17 @@ export default {
         }
         },
         handleSizeChange(){},
-        handleCurrentChange(){},
+        handleCurrentChange(current){
+          var m = new Map([[1, 0], [2, 5], [3, 10], [4, 15], [5, 20], [6, 25]]);
+          this.Query.start =  m.get(current);
+          console.log(this.Query.start);
+          this.handleQueryByPage()
+        },
         handleQueryByPage(){
           this.listLoading = true
-          this.$axios.get('/api/user/queryAllUser').then((response)=>{
+          this.$axios.get('/api/user/queryAllUser/?start=' + this.Query.start).then((response)=>{
             this.tableList = response.data.data;
-            this.total = response.data.data.length
+            this.total = response.data.paging.total[0].total
             this.listLoading = false
           }).catch((response)=>{
             console.log(response);
