@@ -81,11 +81,36 @@ export const constantRouterMap = [
         path: 'index',
         name: 'index',
         component: () => import('@/views/musicPage/recommended'),
-        meta: { title: '推荐管理', icon: 'candleChart' }
+        meta: { title: '推荐音乐', icon: 'candleChart' }
       }
     ]
   },
-
+  {
+    path: '/playlistrecommended',
+    component: Layout,
+    redirect: 'playlistrecommended',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/playlistrecommend'),
+        meta: { title: '推荐歌单', icon: 'candleChart' }
+      }
+    ]
+  },
+  {
+    path: '/singermange',
+    component: Layout,
+    redirect: 'singermange',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/singermange'),
+        meta: { title: '歌手管理', icon: 'international' }
+      }
+    ]
+  },
   {
     path: '/user',
     component: Layout,
@@ -99,6 +124,8 @@ export const constantRouterMap = [
       }
     ]
   },
+  
+  
   // //  第三方官网
   // {
   //   path: '/musicmange',

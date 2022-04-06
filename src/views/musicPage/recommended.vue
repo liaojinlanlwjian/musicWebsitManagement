@@ -62,7 +62,7 @@
             </el-table-column>
             <el-table-column align="center" label="歌曲类型" width="140">
              <template slot-scope="{ row }">
-                {{ row.musicType }}
+                <el-tag type="success">{{ row.musicType }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column align="center" label="是否上线" width="120">
@@ -138,7 +138,7 @@
             </el-table-column>
             <el-table-column align="center" label="歌曲类型" width="140">
              <template slot-scope="{ row }">
-                {{ row.musicType }}
+                <el-tag type="success">{{ row.musicType }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column align="center" label="是否上线" width="140">
@@ -205,7 +205,7 @@
                   </el-table-column>
                   <el-table-column align="center" label="歌曲类型" width="140">
                   <template slot-scope="{ row }">
-                      {{ row.musicType }}
+                      <el-tag type="success">{{ row.musicType }}</el-tag>
                     </template>
                   </el-table-column>
           <el-table-column label="操作" align="center">
