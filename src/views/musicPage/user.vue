@@ -33,7 +33,7 @@
               width="50"
             >
             </el-table-column>
-            <el-table-column align="center" label="账号" width="120">
+            <el-table-column align="center" label="账号" width="280">
               <template slot-scope="{ row }">
                 {{ row.acc }}
               </template>
@@ -58,7 +58,7 @@
                 {{ row.role }}
               </template>
             </el-table-column>
-            <el-table-column align="center" label="地址" width="160">
+            <el-table-column align="center" label="地址" width="200">
               <template slot-scope="{ row }">
                 {{ row.adress }}
               </template>
@@ -367,6 +367,7 @@ export default {
             this.listLoading = true
             this.dialogVisible = false
             if(this.dialogTitle == '增加'){
+              let data = this.$qs.stringify(this.user)
               this.$axios.post(`/api/user/addSingUser`,data).then((response)=>{
                 this.$message.success('添加成功')
                 this.handleQueryByPage()
@@ -380,6 +381,13 @@ export default {
               }).catch((response)=>{
                 console.log(response);
               })
+            }else if(this.dialogTitle == '修改'){
+              setTimeout(() => {
+              this.$message.success('修改成功')
+              this.multipleSelection[0] = this.user
+              // api.saveFile(this.tableList,'operatorManagement')
+              this.listLoading = false
+              }, 500);
             }
             
           } else {
