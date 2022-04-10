@@ -59,6 +59,19 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/slideshow',
+    component: Layout,
+    redirect: 'slideshow',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/slideshow'),
+        meta: { title: '轮播图管理', icon: 'columnar' }
+      }
+    ]
+  },
    {
     path: '/musicmange',
     component: Layout,
