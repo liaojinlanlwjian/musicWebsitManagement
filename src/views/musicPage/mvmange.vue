@@ -1,6 +1,6 @@
 <template>
   <div style="margin-left:10px">
-    <div class="filter-container" style="margin-top:20px">
+    <div style="margin-top:20px" class="filter-container">
       <div style="display: flex">
         <el-button
           class="filter-item"
@@ -28,51 +28,36 @@
       ref="serveTable"
       v-loading="listLoading"
       :data="tableList"
-      style="width: 90%;margin-top:20px"
+      style="width: 100%;margin-top:20px"
       border
       @selection-change="tableChange"
       @row-click="rowClick"
     >
       <el-table-column type="selection" width="40" />
       <el-table-column align="center" label="序号" type="index" width="50" />
-      <el-table-column align="center" label="账号" width="120">
+      <el-table-column align="center" label="mv名称" width="147">
         <template slot-scope="{ row }">
-          {{ row.acc }}
+          {{ row.mvName }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="姓名" width="160">
+      <el-table-column align="center" label="音乐封面" width="200">
         <template slot-scope="{ row }">
-          {{ row.name }}
+          <img style="width:60px;height:60px" :src="row.mvCover">
         </template>
       </el-table-column>
-      <el-table-column align="center" label="性别" width="100">
+      <el-table-column align="center" label="访问量" width="120">
         <template slot-scope="{ row }">
-          {{ row.sex }}
+          {{ row.mvTraffic }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="职务" width="120">
+      <el-table-column align="center" label="作者" width="140">
         <template slot-scope="{ row }">
-          {{ row.work }}
+          {{ row.mvAuthor }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="角色" width="120">
+      <el-table-column align="center" label="mv类型" width="140">
         <template slot-scope="{ row }">
-          {{ row.role }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="地址" width="160">
-        <template slot-scope="{ row }">
-          {{ row.adress }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="电话">
-        <template slot-scope="{ row }">
-          {{ row.tel }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="描述">
-        <template slot-scope="{ row }">
-          {{ row.des }}
+          {{ row.mvType }}
         </template>
       </el-table-column>
     </el-table>
@@ -90,8 +75,8 @@
     <!-- 增加弹窗 -->
     <el-dialog :visible.sync="dialogVisible" :title="dialogTitle">
       <el-form
-        ref="user"
-        :model="user"
+        ref="mv"
+        :model="mv"
         :rules="rules"
         label-width="100px"
         label-position="left"
@@ -99,66 +84,37 @@
         <el-row>
           <el-col :span="10">
             <div class="grid-content bg-purple">
-              <el-form-item label="账号" prop="bianhao">
+              <el-form-item label="mv名称" prop="bianhao">
                 <el-input
-                  v-model="user.acc"
+                  v-model="mv.mvName"
                   style="width: 100%"
                   :disabled="inputDisabled"
-                  placeholder="账号"
                 />
               </el-form-item>
-              <el-form-item label="密码" prop="psd">
+              <el-form-item label="mv作者">
                 <el-input
-                  v-model="user.psd"
+                  v-model="mv.mvAuthor"
                   style="width: 100%"
                   :disabled="inputDisabled"
-                  type="password"
-                  placeholder="密码"
                 />
               </el-form-item>
-              <el-form-item label="性别">
+              <el-form-item label="mv访问量">
+                <el-input
+                  v-model="mv.mvTraffic"
+                  style="width: 100%"
+                  :disabled="inputDisabled"
+                />
+              </el-form-item>
+              <el-form-item label="mv信息" prop="roleIds">
+                <el-input
+                  v-model="mv.mvMsg"
+                  style="width: 100%"
+                  :disabled="inputDisabled"
+                />
+              </el-form-item>
+              <el-form-item label="mv类型" prop="roleIds">
                 <el-select
-                  v-model="user.sex"
-                  placeholder="请选择"
-                  :disabled="inputDisabled"
-                >
-                  <el-option
-                    v-for="item in sexOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="姓名" prop="name">
-                <el-input
-                  v-model="user.name"
-                  style="width: 100%"
-                  :disabled="inputDisabled"
-                  placeholder=" 用户名称"
-                />
-              </el-form-item>
-            </div>
-          </el-col>
-          <el-col :span="11" style="margin-left: 55px">
-            <div class="grid-content bg-purple">
-              <el-form-item label="角色">
-                <el-input
-                  v-model="user.role"
-                  style="width: 100%"
-                  :disabled="inputDisabled"
-                />
-              </el-form-item>
-              <el-form-item label="联系电话" prop="phone">
-                <el-input
-                  v-model="user.tel"
-                  style="width: 100%"
-                  :disabled="inputDisabled"
-                />
-              </el-form-item>
-              <el-form-item label="职务" prop="roleIds">
-                <el-select
-                  v-model="user.work"
+                  v-model="mv.mvType"
                   :disabled="inputDisabled"
                   placeholder="请选择"
                   @change="selectDisposeCode"
@@ -171,52 +127,75 @@
                   />
                 </el-select>
               </el-form-item>
-              <el-form-item label="地址" prop="phone">
+            </div>
+          </el-col>
+          <el-col :span="11" style="margin-left: 55px">
+            <div class="grid-content bg-purple">
+              <el-form-item label="mvAPI" prop="phone">
                 <el-input
-                  v-model="user.adress"
+                  v-model="mv.mvApi"
                   style="width: 100%"
                   :disabled="inputDisabled"
                 />
               </el-form-item>
+              <el-form-item label="mv封面">
+                <el-button
+                  type="primary"
+                  size="mini"
+                  @click="selectPic"
+                >上传mv封面</el-button>
+              </el-form-item>
+              <el-form-item label="mv封面">
+                <img
+                  style="width:200px;height:200px;margin:12px"
+                  :src="mv.mvCover"
+                >
+              </el-form-item>
             </div>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-form-item label=" 用户描述" prop="description">
-            <el-input
-              v-model="user.des"
-              :disabled="inputDisabled"
-              style="width: 100%"
-              type="textarea"
-              :rows="4"
-              placeholder="请输入内容"
-            />
-          </el-form-item>
         </el-row>
       </el-form>
       <div v-if="!inputDisabled" style="text-align: center">
         <el-button type="danger" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="confirm('user')">确认</el-button>
+        <el-button type="primary" @click="confirm('mv')">确认</el-button>
       </div>
+    </el-dialog>
+    <el-dialog :visible.sync="uploadDialog" title="上传图片">
+      <el-upload
+        ref="upload"
+        class="upload-demo"
+        action=""
+        :on-change="changeFile"
+        :file-list="fileList"
+        :auto-upload="false"
+      >
+        <el-button
+          slot="trigger"
+          size="small"
+          type="primary"
+        >选取文件</el-button>
+        <el-button
+          style="margin-left: 10px;"
+          size="small"
+          type="success"
+          @click="upload"
+        >上传到服务器</el-button>
+      </el-upload>
     </el-dialog>
   </div>
 </template>
 <script>
-// import {default as api} from '../../store/saveData'
 export default {
   data() {
     return {
+      chooseFile: {},
+      fileList: [],
+      uploadDialog: false,
       dialogTitle: '增加',
       multipleSelection: [],
       inputDisabled: false,
-      user: {
-        acc: '212',
-        psd: '212',
-        name: '212',
-        role: '212',
-        tel: '212',
-        des: '212',
-        adress: '212'
+      mv: {
+        mvCover: ''
       },
       dialogVisible: false,
       listLoading: false,
@@ -225,81 +204,84 @@ export default {
         start: 0,
         num: 2
       },
-      tableList: [
-        {
-          bianhao: '2016-05-02',
-          name: '王小虎',
-          sex: '男',
-          work: '董事长',
-          role: '超级管理员',
-          remark: '小心点',
-          phone: ' 1518 弄'
-        },
-        {
-          bianhao: '07716',
-          name: '王小猪',
-          sex: '男',
-          work: '副董事长',
-          role: '超级管理员',
-          remark: '千万小心点',
-          phone: ' 1519 弄'
-        }
-      ],
-      sexOptions: [
-        {
-          value: '男',
-          label: '男'
-        },
-        {
-          value: '女',
-          label: '女'
-        }
-      ],
+      tableList: [],
       rules: {
         name: [
           { required: true, message: '请选择用户的角色', trigger: 'blur' }
         ],
-        psd: [{ required: true, message: '请输入地址', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入地址', trigger: 'blur' }],
         account: [
           { required: true, message: '请选择用户的部门', trigger: 'blur' }
         ]
       },
       options: [
         {
-          value: '总经理',
-          label: '总经理'
+          value: '情歌',
+          label: '情歌'
         },
         {
-          value: '秘书',
-          label: '秘书'
+          value: '摇滚',
+          label: '摇滚'
         },
         {
-          value: '董事长',
-          label: '董事长'
+          value: '电音',
+          label: '电音'
+        },
+        {
+          value: '外国',
+          label: '外国'
+        },
+        {
+          value: '古风',
+          label: '古风'
         }
       ]
     }
   },
   created() {
     this.handleQueryByPage()
-    // let data = api.showFile('operatorManagement')
-    // if (data == null || data == undefined) {
-    //   this.total = this.tableList.length
-    //   return
-    // }
-    // this.tableList = data
-    // this.total = this.tableList.length
   },
   methods: {
+    selectPic() {
+      this.uploadDialog = true
+    },
+    changeFile(file) {
+      this.chooseFile = file
+    },
+    upload() {
+      if (Object.keys(this.chooseFile).length === 0) {
+        this.$message.error('请先选择图片')
+        return
+      }
+      var formData = new FormData()
+      // 创建formdata对象
+      formData.append('file', this.chooseFile.raw)
+      // 将文件信息 append 进入formdata对象  key值 为后台 single 设置的值
+      this.$axios
+        .post('/api/music/upload', formData, {
+          Headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        .then(res => {
+          this.uploadDialog = false
+          this.$message.success('上传成功')
+          this.mv.mvCover = 'http://localhost:3001' + res.data.data
+        })
+        .catch(() => {
+          this.$message.error('上传失败，请重试')
+        })
+      return
+    },
     // 监听row-click事件，实现选中
     rowClick(row, column, event) {
       this.$refs.serveTable.toggleRowSelection(row)
     },
     getUserMsg(id) {
       this.$axios
-        .get(`/api/user/querySingleUser/?id=` + id)
+        .get(`/api/mvList/querySingMv/?id=` + id)
         .then(response => {
-          this.user = response.data.data[0]
+          this.mv = response.data.data[0]
         })
         .catch(response => {
           console.log(response)
@@ -328,9 +310,7 @@ export default {
         .then(() => {
           this.listLoading = true
           this.$axios
-            .delete(
-              `/api/user/deleteSingUser/?id=` + this.multipleSelection[0].id
-            )
+            .delete(`/api/mvList/deleteMv/?id=` + this.multipleSelection[0].id)
             .then(response => {
               this.$message({
                 type: 'success',
@@ -373,22 +353,23 @@ export default {
     confirm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          const data = this.$qs.stringify(this.user)
+          const data = this.$qs.stringify(this.mv)
           this.listLoading = true
           this.dialogVisible = false
           if (this.dialogTitle === '增加') {
             this.$axios
-              .post(`/api/user/addSingUser`, data)
+              .post(`/api/mvList/addMv`, data)
               .then(response => {
                 this.$message.success('添加成功')
                 this.handleQueryByPage()
+                this.fileList = []
               })
               .catch(response => {
                 console.log(response)
               })
           } else if (this.dialogTitle === '编辑') {
             this.$axios
-              .post(`/api/user/editSingUser`, data)
+              .post(`/api/mvList/editMv`, data)
               .then(response => {
                 this.$message.success('更新成功')
                 this.handleQueryByPage()
@@ -419,19 +400,20 @@ export default {
     handleCurrentChange(current) {
       var m = new Map([[1, 0], [2, 5], [3, 10], [4, 15], [5, 20], [6, 25]])
       this.Query.start = m.get(current)
-      console.log(this.Query.start)
       this.handleQueryByPage()
     },
     handleQueryByPage() {
       this.listLoading = true
       this.$axios
-        .get('/api/user/queryAllUser/?start=' + this.Query.start)
+        .get('/api/mvList/queryAllMvByPage/?start=' + this.Query.start)
         .then(response => {
           this.tableList = response.data.data
           this.total = response.data.paging.total[0].total
           this.listLoading = false
         })
         .catch(response => {
+          this.listLoading = false
+          this.$message.error('获取失败')
           console.log(response)
         })
     }

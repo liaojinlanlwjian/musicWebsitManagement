@@ -59,15 +59,16 @@ module.exports = {
     port: port,
     // open: true,
     // host:'127.0.0.1',
-    proxy:{    
-      '/api':{
-        target:'http://localhost:3001',
-            
-        changeOrigin:true,
-        pathRewrite:{
-          '^/api^':'/' 
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api^': '/'
         }
-      }  }
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
@@ -101,7 +102,7 @@ module.exports = {
       .rule('vue')
       .use('vue-loader')
       .loader('vue-loader')
-      .tap((options) => {
+      .tap(options => {
         options.compilerOptions.preserveWhitespace = true
         return options
       })
@@ -109,18 +110,20 @@ module.exports = {
 
     config
       // https://webpack.js.org/configuration/devtool/#development
-      .when(process.env.NODE_ENV === 'development', (config) =>
+      .when(process.env.NODE_ENV === 'development', config =>
         config.devtool('cheap-source-map')
       )
 
-    config.when(process.env.NODE_ENV !== 'development', (config) => {
+    config.when(process.env.NODE_ENV !== 'development', config => {
       config
         .plugin('ScriptExtHtmlWebpackPlugin')
         .after('html')
-        .use('script-ext-html-webpack-plugin', [{
-          // `runtime` must same as runtimeChunk name. default is `runtime`
-          inline: /runtime\..*\.js$/
-        }])
+        .use('script-ext-html-webpack-plugin', [
+          {
+            // `runtime` must same as runtimeChunk name. default is `runtime`
+            inline: /runtime\..*\.js$/
+          }
+        ])
         .end()
       config.optimization.splitChunks({
         chunks: 'all',

@@ -35,9 +35,22 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/dashboard/dashboard'
   },
-  { path: '/login', component: () => import('@/views/login'), name: '登录NxAdmin', hidden: true },
-  { path: '/404', component: () => import('@/views/errorPage/404'), hidden: true },
-  { path: '/401', component: () => import('@/views/errorPage/401'), hidden: true },
+  {
+    path: '/login',
+    component: () => import('@/views/login'),
+    name: '登录NxAdmin',
+    hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/errorPage/404'),
+    hidden: true
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/errorPage/401'),
+    hidden: true
+  },
   // 锁屏
   {
     path: '/lock',
@@ -59,7 +72,7 @@ export const constantRouterMap = [
       }
     ]
   },
-   {
+  {
     path: '/musicmange',
     component: Layout,
     redirect: 'musicmange',
@@ -99,6 +112,19 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/mv',
+    component: Layout,
+    redirect: 'mv',
+    children: [
+      {
+        path: 'mv',
+        name: 'mv',
+        component: () => import('@/views/musicPage/mvmange'),
+        meta: { title: 'mv管理', icon: 'international' }
+      }
+    ]
+  }
   // //  第三方官网
   // {
   //   path: '/musicmange',
@@ -112,7 +138,7 @@ export const constantRouterMap = [
   //     component: () => import('@/views/electronic/administrativeenforcement'),
   // }
   // },
-   // 表格
+  // 表格
   //  {
   //   path: '/electronic',
   //   component: Layout,
@@ -768,4 +794,5 @@ export const asyncRouterMap = [
   //     }
   //   ]
   // },
-  { path: '*', redirect: '/404', hidden: true }]
+  { path: '*', redirect: '/404', hidden: true }
+]
