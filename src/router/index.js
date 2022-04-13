@@ -73,6 +73,22 @@ export const constantRouterMap = [
     ]
   },
   {
+<<<<<<< HEAD
+=======
+    path: '/slideshow',
+    component: Layout,
+    redirect: 'slideshow',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/slideshow'),
+        meta: { title: '轮播图管理', icon: 'columnar' }
+      }
+    ]
+  },
+   {
+>>>>>>> 823c3f26bf6eb2058bfa147a7b214c5cdb1b5f23
     path: '/musicmange',
     component: Layout,
     redirect: 'musicmange',
@@ -94,11 +110,36 @@ export const constantRouterMap = [
         path: 'index',
         name: 'index',
         component: () => import('@/views/musicPage/recommended'),
-        meta: { title: '推荐管理', icon: 'candleChart' }
+        meta: { title: '推荐音乐', icon: 'candleChart' }
       }
     ]
   },
-
+  {
+    path: '/playlistrecommended',
+    component: Layout,
+    redirect: 'playlistrecommended',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/playlistrecommend'),
+        meta: { title: '推荐歌单', icon: 'candleChart' }
+      }
+    ]
+  },
+  {
+    path: '/singermange',
+    component: Layout,
+    redirect: 'singermange',
+    children: [
+      {
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/musicPage/singermange'),
+        meta: { title: '歌手管理', icon: 'international' }
+      }
+    ]
+  },
   {
     path: '/user',
     component: Layout,
@@ -112,6 +153,7 @@ export const constantRouterMap = [
       }
     ]
   },
+<<<<<<< HEAD
   {
     path: '/mv',
     component: Layout,
@@ -125,6 +167,10 @@ export const constantRouterMap = [
       }
     ]
   }
+=======
+  
+  
+>>>>>>> 823c3f26bf6eb2058bfa147a7b214c5cdb1b5f23
   // //  第三方官网
   // {
   //   path: '/musicmange',

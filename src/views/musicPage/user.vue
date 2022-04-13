@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div style="margin-left:10px">
     <div class="filter-container" style="margin-top:20px">
       <div style="display: flex">
@@ -32,6 +33,98 @@
       border
       @selection-change="tableChange"
       @row-click="rowClick"
+=======
+    <div style="margin-left:10px">
+        <div class="filter-container" style="margin-top:20px">
+            <div style="display: flex">
+              <el-button class="filter-item" type="primary"  @click="showOperator"
+                >查看</el-button
+              >
+              <el-button class="filter-item" type="primary" @click="addOperator"
+                >增加</el-button
+              >
+              <el-button class="filter-item" type="primary"  @click="editOperator"
+                >修改</el-button
+              >
+              <el-button class="filter-item" type="danger"  @click="deleteOperator"
+                >删除</el-button
+              >
+            </div>
+          </div>
+          <el-table
+            :data="tableList"
+            @selection-change="tableChange"
+            style="width: 90%;margin-top:20px"
+            border
+            ref="serveTable"
+            v-loading="listLoading"
+            @row-click="rowClick"
+          >
+            <el-table-column type="selection" width="40"> </el-table-column>
+            <el-table-column
+              align="center"
+              label="序号"
+              type="index"
+              width="50"
+            >
+            </el-table-column>
+            <el-table-column align="center" label="账号" width="280">
+              <template slot-scope="{ row }">
+                {{ row.acc }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="姓名" width="160">
+              <template slot-scope="{ row }">
+                {{ row.name }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="性别" width="100">
+              <template slot-scope="{ row }">
+                {{ row.sex }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="职务" width="120">
+              <template slot-scope="{ row }">
+                {{ row.work }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="角色" width="120">
+              <template slot-scope="{ row }">
+                {{ row.role }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="地址" width="200">
+              <template slot-scope="{ row }">
+                {{ row.adress }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="电话">
+              <template slot-scope="{ row }">
+                {{ row.tel }}
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="描述">
+              <template slot-scope="{ row }">
+                {{ row.des }}
+              </template>
+            </el-table-column>
+          </el-table>
+          <!-- 主表的分页 -->
+          <el-pagination
+            :current-page="Query.current"
+            :page-sizes="[5]"
+            :page-size="Query.size"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            @pagination="handleQueryByPage"
+          />
+          <!-- 增加弹窗 -->
+    <el-dialog
+      :visible.sync="dialogVisible"
+      :title="dialogTitle"
+>>>>>>> 823c3f26bf6eb2058bfa147a7b214c5cdb1b5f23
     >
       <el-table-column type="selection" width="40" />
       <el-table-column align="center" label="序号" type="index" width="50" />
@@ -346,6 +439,7 @@ export default {
                 message: '删除error'
               })
             })
+<<<<<<< HEAD
         })
         .catch(() => {
           this.$message({
@@ -380,6 +474,40 @@ export default {
             this.$axios
               .post(`/api/user/addSingUser`, data)
               .then(response => {
+=======
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });          
+        });
+        },
+        async editOperator(){
+            if (this.multipleSelection.length == 0) {
+                this.$message.error('请选择一条数据')
+                return
+            }
+            await this.getUserMsg(this.multipleSelection[0].id)
+            this.inputDisabled = false
+            this.dialogTitle = '编辑'
+            this.dialogVisible = true
+        },
+        addOperator(){
+            this.dialogTitle = '增加'
+            this.inputDisabled = false
+            this.dialogVisible = true
+            // this.user = {}
+        },
+        confirm(formName){
+          this.$refs[formName].validate((valid) => {
+          if (valid) {
+            let data = this.$qs.stringify(this.user)
+            this.listLoading = true
+            this.dialogVisible = false
+            if(this.dialogTitle == '增加'){
+              let data = this.$qs.stringify(this.user)
+              this.$axios.post(`/api/user/addSingUser`,data).then((response)=>{
+>>>>>>> 823c3f26bf6eb2058bfa147a7b214c5cdb1b5f23
                 this.$message.success('添加成功')
                 this.handleQueryByPage()
               })
@@ -393,9 +521,24 @@ export default {
                 this.$message.success('更新成功')
                 this.handleQueryByPage()
               })
+<<<<<<< HEAD
               .catch(response => {
                 console.log(response)
               })
+=======
+            }else if(this.dialogTitle == '修改'){
+              setTimeout(() => {
+              this.$message.success('修改成功')
+              this.multipleSelection[0] = this.user
+              // api.saveFile(this.tableList,'operatorManagement')
+              this.listLoading = false
+              }, 500);
+            }
+            
+          } else {
+            console.log('error submit!!');
+            return false;
+>>>>>>> 823c3f26bf6eb2058bfa147a7b214c5cdb1b5f23
           }
         } else {
           console.log('error submit!!')
